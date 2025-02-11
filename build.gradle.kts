@@ -16,14 +16,15 @@
 
 plugins {
     groovy
-    kotlin("jvm") version("2.0.0")
+    kotlin("jvm") version("2.1.10")
     `kotlin-dsl`
-    val dgtVersion = "2.5.0"
-    id("dev.deftu.gradle.tools") version(dgtVersion)
-    id("dev.deftu.gradle.tools.publishing.maven") version(dgtVersion)
+    `maven-publish`
 }
 
 val kotestVersion: String by project.extra
+
+group = property("project.group") as String
+version = property("project.version") as String
 
 java {
     withSourcesJar()
@@ -49,13 +50,26 @@ dependencies {
 gradlePlugin {
     plugins {
         register("preprocess") {
-            id = "dev.deftu.gradle.preprocess"
+            id = "xyz.bluspring.deftu.gradle.preprocess"
             implementationClass = "com.replaymod.gradle.preprocess.PreprocessPlugin"
         }
 
         register("preprocess-root") {
-            id = "dev.deftu.gradle.preprocess-root"
+            id = "xyz.bluspring.deftu.gradle.preprocess-root"
             implementationClass = "com.replaymod.gradle.preprocess.RootPreprocessPlugin"
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "devOS"
+            url = uri("https://mvn.devos.one/releases")
+            credentials {
+                username = System.getenv()["MAVEN_USER"]
+                password = System.getenv()["MAVEN_PASS"]
+            }
         }
     }
 }
